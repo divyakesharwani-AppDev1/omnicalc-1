@@ -47,10 +47,22 @@ class ApplicationController < ActionController::Base
 
   def calculate_payment
     #Parameters: {"user_apr"=>"3s", "user_years"=>"5", "user_pv"=>"250000"}
-    @rate = params.fetch("user_apr").to_f
-    @num_of_year = params.fetch("user_years").to_f
-    @principal = params.fetch("user_pv").to_f
-    @payment_cal = @rate*@num_of_year*@principal
+    
+    rate1 = params.fetch("user_apr").to_f.round(4)
+    @rate = rate1.to_s(:percentage)
+    rate_per_month = rate1/12
+    
+    @num_of_year = params.fetch("user_years").to_i
+    total_period = @num_of_year*12
+    
+    principal1 = params.fetch("user_pv").to_f
+    @principal = principal1.to_s(:currency)
+    
+    term1 = (rate_per_month/100)*((1+rate_per_month/100)**(total_period))
+    term2 = ((1+rate_per_month/100)**(total_period))-1
+    
+    payment_cal1 = principal1*(term1)/(term2)
+    @payment_cal = payment_cal1.round(2).to_s(:currency)
 
     render({:template=>"calculation_templates/payment_results.html.erb"})
   end
