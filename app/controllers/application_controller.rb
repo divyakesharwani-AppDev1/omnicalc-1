@@ -48,9 +48,10 @@ class ApplicationController < ActionController::Base
   def calculate_payment
     #Parameters: {"user_apr"=>"3s", "user_years"=>"5", "user_pv"=>"250000"}
     
-    rate1 = params.fetch("user_apr").to_f.round(4)
-    @rate = rate1.to_s(:percentage)
+    rate1 = params.fetch("user_apr").to_f
     rate_per_month = rate1/12
+    @rate = rate1.to_s(:percentage,{:precision=>4})
+   
     
     @num_of_year = params.fetch("user_years").to_i
     total_period = @num_of_year*12
@@ -62,7 +63,7 @@ class ApplicationController < ActionController::Base
     term2 = ((1+rate_per_month/100)**(total_period))-1
     
     payment_cal1 = principal1*(term1)/(term2)
-    @payment_cal = payment_cal1.round(2).to_s(:currency)
+    @payment_cal = payment_cal1.to_s(:currency)
 
     render({:template=>"calculation_templates/payment_results.html.erb"})
   end
